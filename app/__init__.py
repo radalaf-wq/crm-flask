@@ -3,17 +3,19 @@ import os
 from flask import Flask
 from .extensions import db
 
+
 def create_app():
     app = Flask(__name__)
 
     # === базовая конфигурация ===
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
 
-    # Render положит строку подключения Postgres в DATABASE_URL
+    # Render кладёт строку подключения Postgres в DATABASE_URL
     db_url = os.environ.get("DATABASE_URL")
     if db_url and db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
+    # Если вдруг DATABASE_URL нет — локально свалимся на SQLite
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url or "sqlite:///local.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -23,8 +25,7 @@ def create_app():
     # === регистрация моделей и blueprints ===
     with app.app_context():
         from . import models  # чтобы модели зарегистрировались
-        # временно можно раскомментировать для создания таблиц:
-        # db.create_all()
+        db.create_all()       # ВРЕМЕННО: создать таблицы в БД
 
         from .views.dashboard import bp as dashboard_bp
         app.register_blueprint(dashboard_bp)
