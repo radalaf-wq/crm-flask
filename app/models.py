@@ -77,7 +77,6 @@ class Task(db.Model):
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    attachments = db.relationship("Attachment", back_populates="task", lazy="dynamic")
 
     def __repr__(self):
         return f"<Task {self.id} {self.title}>"
