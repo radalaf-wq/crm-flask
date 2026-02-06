@@ -13,8 +13,8 @@ def get_dashboard_counters():
         db.session.query(func.count(Task.id))
         .filter(
             Task.status != "done",
-            Task.deadline != None,
-            Task.deadline < datetime.utcnow(),
+            Task.end_date != None,
+            Task.end_date < datetime.utcnow(),
         )
         .scalar()
     )
