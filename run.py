@@ -26,4 +26,4 @@ if __name__ == "__main__":
     print("Бот запущен в фоновом режиме")
     
     # Запускаем Flask приложение
-        app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False)
+        run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False)
