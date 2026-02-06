@@ -19,7 +19,6 @@ class User(db.Model):
         return f"<User {self.id} {self.name}>"
 
 class Project(db.Model):
-        materials = db.relationship("ProjectMaterial", back_populates="project", lazy="dynamic")
     __tablename__ = "projects"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +37,8 @@ class Project(db.Model):
     updated_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    # u0421u0432u044fu0437u044c u0441 u043cu0430u0442u0435u0440u0438u0430u043bu0430u043cu0438
+    materials = db.relationship("ProjectMaterial", back_populates="project", lazy="dynamic")
 
     def __repr__(self):
         return f"<Project {self.id} {self.name}>"
@@ -98,52 +99,50 @@ class Attachment(db.Model):
         return f"<Attachment {self.id} {self.file_name}>"
 
 
-        class Material(db.Model):
+# ========== Материалы ==========
+
+class Material(db.Model):
+    """Материал на складе"""
     __tablename__ = "materials"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    unit = db.Column(db.String(50), nullable=False)  # м, шт, кг и т.п.
-    unit_price = db.Column(db.Numeric(10, 2), nullable=True)  # цена за единицу
-    total_quantity = db.Column(db.Numeric(10, 2), nullable=False, default=0)  # общее кол-во на складе
+    unit = db.Column(db.String(50), nullable=False)
+    unit_price = db.Column(db.Float, default=0)
+    total_quantity = db.Column(db.Float, default=0)
     description = db.Column(db.Text, nullable=True)
-
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # связь с ProjectMaterial
+    # Связь с проектами
     project_materials = db.relationship("ProjectMaterial", back_populates="material", lazy="dynamic")
 
     def __repr__(self):
-        return f"<Material {self.id} {self.name}>"
+        return f"Material {self.id} {self.name}"
 
 
-        class ProjectMaterial(db.Model):
+class ProjectMaterial(db.Model):
+    """Связь материалов с проектами"""
     __tablename__ = "project_materials"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    project_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=False, index=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=False)
     project = db.relationship("Project", back_populates="materials")
 
-    material_id = db.Column(db.Integer, db.ForeignKey("materials.id"), nullable=False, index=True)
+    material_id = db.Column(db.Integer, db.ForeignKey("materials.id"), nullable=False)
     material = db.relationship("Material", back_populates="project_materials")
 
-    planned_quantity = db.Column(db.Numeric(10, 2), nullable=False, default=0)  # запланировано
-    used_quantity = db.Column(db.Numeric(10, 2), nullable=False, default=0)     # использовано
+    planned_quantity = db.Column(db.Float, nullable=False, default=0)
+    used_quantity = db.Column(db.Float, nullable=False, default=0)
     notes = db.Column(db.Text, nullable=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @property
     def remaining_quantity(self):
-        """Вычисляемое поле: остаток = запланировано - использовано"""
         return self.planned_quantity - self.used_quantity
 
     def __repr__(self):
-        return f"<ProjectMaterial {self.id} Project:{self.project_id} Material:{self.material_id}>"
+        return f"ProjectMaterial {self.id} (Project {self.project_id}, Material {self.material_id})"
