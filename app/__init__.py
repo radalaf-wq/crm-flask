@@ -52,6 +52,11 @@ def create_app():
     def health():
         return "OK"
 
+            @app.route("/")
+    def index():
+        from flask import redirect, url_for
+        return redirect(url_for("dashboard.index"))
+
 
     # Пересоздать БД при каждом запуске
     with app.app_context():
