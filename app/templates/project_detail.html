@@ -9,7 +9,7 @@
     <div class="card mt-4">
         <div class="card-body">
             <h5 class="card-title">Информация о проекте</h5>
-            <p><strong>Бюджет:</strong> {{ "project.budget | round(2) }} ₽</p>
+            <p><strong>Бюджет:</strong> {{ project.budget | round(2) }} ₽</p>
             <p><strong>Дата начала:</strong> {{ project.start_date.strftime('%d.%m.%Y') }}</p>
             {% if project.end_date %}
             <p><strong>Дата окончания:</strong> {{ project.end_date.strftime('%d.%m.%Y') }}</p>
