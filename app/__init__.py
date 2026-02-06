@@ -30,11 +30,11 @@ def create_app():
         db.create_all()
 
         from .views.dashboard import bp as dashboard_bp
-                from .views.materials import bp as materials_bp
-                        app.register_blueprint(materials_bp)
+        from .views.materials import bp as materials_bp
         from .views.projects import bp as projects_bp
         from .views.tasks import bp as tasks_bp
         app.register_blueprint(dashboard_bp)
+        app.register_blueprint(materials_bp)
         app.register_blueprint(projects_bp)
         app.register_blueprint(tasks_bp)
     @app.route("/health")
