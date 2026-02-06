@@ -25,7 +25,7 @@ def new():
         db.session.add(material)
         db.session.commit()
         flash('Материал успешно создан!', 'success')
-        return redirect(url_for('materials.list_materials'))
+        return redirect(url_for(''))
     
     return render_template('material_form.html', material=None)
 
@@ -44,7 +44,7 @@ def edit(id):
         
         db.session.commit()
         flash('Материал успешно обновлен!', 'success')
-        return redirect(url_for('materials.list_materials'))
+        return redirect(url_for(''))
     
     return render_template('material_form.html', material=material)
 
@@ -55,7 +55,7 @@ def delete(id):
     db.session.delete(material)
     db.session.commit()
     flash('Материал успешно удален!', 'success')
-    return redirect(url_for('materials.list_materials'))
+    return redirect(url_for(''))
 
 @bp.route('/project/<int:project_id>')
 def project_materials(project_id):
