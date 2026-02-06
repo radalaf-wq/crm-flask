@@ -55,9 +55,21 @@ def create_app():
 
     # Пересоздать БД при каждом запуске
     with app.app_context():
-        try:
-            db.drop_all()
-        except:
-            pass
+        # Удаляем и пересоздаем таблицы принудительно
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        
+        # Получаем список всех таблиц
+        tables = inspector.get_table_names()
+        
+        # Удаляем все таблицы
+        if tables:
+            with db.engine.connect() as conn:
+                conn.execute(db.text('DROP SCHEMA public CASCADE'))
+                conn.execute(db.text('CREATE SCHEMA public'))
+                conn.commit()
+        
+        # Создаем таблицы заново
         db.create_all()
+
     return app
