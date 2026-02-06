@@ -48,9 +48,9 @@
                         </form>
                     </div>
 
-                    {% if project.attachments.all()|length > 0 %}
+                    {% if project.attachments|length > 0 %}
                                 <div class="list-group">
-                                                    {% for attachment in project.attachments.all() %}
+                                                    {% for attachment in project.attachments %}
                                                                         <div class="list-group-item">{{ attachment.filename }} <small>({{ attachment.uploaded_at.strftime('%d.%m.%Y %H:%M') }})</small></div>
                                                                                         {% endfor %}
                                                                                                     </div>

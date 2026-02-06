@@ -40,7 +40,7 @@ class Project(db.Model):
     # u0421u0432u044fu0437u044c u0441 u043cu0430u0442u0435u0440u0438u0430u043bu0430u043cu0438
     materials = db.relationship("ProjectMaterial", back_populates="project", lazy="dynamic")
     comments = db.relationship("Comment", back_populates="project", lazy="dynamic")
-    attachments = db.relationship("Attachment", back_populates="project", lazy="dynamic")
+    attachments = db.relationship("Attachment", back_populates="project", lazy="select")
 
     def __repr__(self):
         return f"<Project {self.id} {self.name}>"
