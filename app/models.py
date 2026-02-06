@@ -100,25 +100,6 @@ class Attachment(db.Model):
         return f"<Attachment {self.id} {self.filename}>"
 
 
-class Attachment(db.Model):
-    __tablename__ = "attachments"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    task_id = db.Column(db.Integer, db.ForeignKey("tasks.id"), nullable=False, index=True)
-    task = db.relationship("Task", back_populates="attachments")
-
-    file_name = db.Column(db.String(255), nullable=False)
-    storage_path = db.Column(db.String(512), nullable=False)  # путь/ключ на Яндекс.Диске/S3
-    mime_type = db.Column(db.String(100), nullable=True)
-    size_bytes = db.Column(db.Integer, nullable=True)
-
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"<Attachment {self.id} {self.file_name}>"
-
-
 # ========== Материалы ==========
 
 class Material(db.Model):
