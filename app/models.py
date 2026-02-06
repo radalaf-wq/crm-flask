@@ -85,6 +85,7 @@ class Task(db.Model):
 class Attachment(db.Model):
     """Вложение к проекту"""
     __tablename__ = "attachments"
+    __table_args__ = {"extend_existing": True}
 
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=False)
