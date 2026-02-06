@@ -26,6 +26,7 @@ def create_app():
     with app.app_context():
         from . import models  # чтобы модели зарегистрировались
 
+        from . import models  # чтобы модели зарегистрировались
         # ВРЕМЕННО: создать таблицы в БД на старте
         db.create_all()
 
