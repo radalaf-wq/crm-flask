@@ -42,7 +42,7 @@ def create_project():
         db.session.add(project)
         db.session.commit()
         flash("Проект создан", "success")
-        return redirect(url_for("projects.list_projects_projects"))
+        return redirect(url_for("projects.list_projects"))
 
     return render_template("project_form.html")
 
