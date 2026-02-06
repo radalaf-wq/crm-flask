@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Новый проект</h2>
+
+<form method="post" class="mt-3" style="max-width: 600px;">
+  <div class="mb-3">
+    <label class="form-label">Название *</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Клиент</label>
+    <input type="text" name="client" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Статус</label>
+    <select name="status" class="form-select">
+      <option value="active">active</option>
+      <option value="on_hold">on_hold</option>
+      <option value="closed">closed</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Дедлайн</label>
+    <input type="date" name="deadline" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Описание</label>
+    <textarea name="description" class="form-control" rows="3"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Сохранить</button>
+  <a href="{{ url_for('projects.list_projects') }}" class="btn btn-secondary ms-2">Отмена</a>
+</form>
+{% endblock %}

@@ -28,7 +28,10 @@ def create_app():
         db.create_all()       # ВРЕМЕННО: создать таблицы в БД
 
         from .views.dashboard import bp as dashboard_bp
-        app.register_blueprint(dashboard_bp)
+from .views.projects import bp as projects_bp
+app.register_blueprint(dashboard_bp)
+app.register_blueprint(projects_bp)
+
 
     @app.route("/health")
     def health():

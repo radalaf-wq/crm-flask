@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Проекты</h2>
+  <a href="{{ url_for('projects.create_project') }}" class="btn btn-primary">Новый проект</a>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Название</th>
+      <th>Клиент</th>
+      <th>Статус</th>
+      <th>Дедлайн</th>
+      <th>Создан</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in projects %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.client or '-' }}</td>
+      <td>{{ p.status }}</td>
+      <td>{{ p.deadline.strftime('%Y-%m-%d') if p.deadline else '-' }}</td>
+      <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" class="text-center text-muted">Пока нет проектов</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

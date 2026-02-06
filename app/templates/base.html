@@ -7,10 +7,12 @@
   </head>
   <body class="bg-light">
     <nav class="navbar navbar-dark bg-dark mb-4">
-      <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">CRM Dashboard</span>
-      </div>
-    </nav>
+  <div class="container-fluid">
+    <a class="navbar-brand mb-0 h1" href="{{ url_for('dashboard.index') }}">CRM Dashboard</a>
+    <a class="nav-link text-light" href="{{ url_for('projects.list_projects') }}">Проекты</a>
+  </div>
+</nav>
+
     <div class="container">
       {% block content %}{% endblock %}
     </div>
