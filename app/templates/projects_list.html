@@ -20,7 +20,7 @@
     {% for p in projects %}
     <tr>
       <td>{{ p.id }}</td>
-      <td>{{ p.name }}</td>
+      <td><a href="{{ url_for('projects.view_project', id=p.id) }}" class="text-decoration-none">{{ p.name }}</a></td>
       <td>{{ p.client or '-' }}</td>
       <td>{{ p.status }}</td>
       <td>{{ p.deadline.strftime('%Y-%m-%d') if p.deadline else '-' }}</td>

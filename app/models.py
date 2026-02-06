@@ -39,6 +39,7 @@ class Project(db.Model):
     )
     # u0421u0432u044fu0437u044c u0441 u043cu0430u0442u0435u0440u0438u0430u043bu0430u043cu0438
     materials = db.relationship("ProjectMaterial", back_populates="project", lazy="dynamic")
+    comments = db.relationship("Comment", back_populates="project", lazy="dynamic")
 
     def __repr__(self):
         return f"<Project {self.id} {self.name}>"
@@ -146,3 +147,25 @@ class ProjectMaterial(db.Model):
 
     def __repr__(self):
         return f"ProjectMaterial {self.id} (Project {self.project_id}, Material {self.material_id})"
+
+
+# ========== Комментарии ==========
+
+class Comment(db.Model):
+    """Комментарий к проекту"""
+    __tablename__ = "comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    
+    project_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=False)
+    project = db.relationship("Project", back_populates="comments")
+    
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship("User", backref="comments")
+    
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"Comment {self.id} on Project {self.project_id}"

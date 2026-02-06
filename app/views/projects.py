@@ -45,3 +45,71 @@ def create_project():
         return redirect(url_for("projects.list_projects"))
 
     return render_template("project_form.html")
+
+
+@bp.route('/<int:id>')
+def view_project(id):
+    """Просмотр детальной информации о проекте"""
+    project = Project.query.get_or_404(id)
+    return render_template('project_detail.html', project=project)
+
+
+@bp.route('/<int:id>/comment', methods=['POST'])
+def add_comment(id):
+    """Добавить комментарий к проекту"""
+    from app.models import Comment
+    project = Project.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        comment = Comment(
+            text=request.form['text'],
+            project_id=id,
+            user_id=1  # TODO: заменить на current_user.id после авторизации
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Комментарий добавлен!', 'success')
+    
+    return redirect(url_for('projects.view_project', id=id))
+
+
+@bp.route('/<int:id>/upload', methods=['POST'])
+def upload_file(id):
+    """Загрузить файл к проекту"""
+    from app.models import Attachment
+    import os
+    from werkzeug.utils import secure_filename
+    
+    project = Project.query.get_or_404(id)
+    
+    if 'file' not in request.files:
+        flash('Файл не выбран', 'error')
+        return redirect(url_for('projects.view_project', id=id))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash('Файл не выбран', 'error')
+        return redirect(url_for('projects.view_project', id=id))
+    
+    if file:
+        filename = secure_filename(file.filename)
+        # Создаем папку для загрузок, если ее нет
+        upload_folder = os.path.join('app', 'static', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+        
+        # Сохраняем информацию о файле в БД
+        attachment = Attachment(
+            file_name=filename,
+            file_path=f'uploads/{filename}',
+            file_size=os.path.getsize(filepath),
+            project_id=id,
+            uploaded_by_id=1  # TODO: заменить на current_user.id
+        )
+        db.session.add(attachment)
+        db.session.commit()
+        flash(f'Файл {filename} успешно загружен!', 'success')
+    
+    return redirect(url_for('projects.view_project', id=id))

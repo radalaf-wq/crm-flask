@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ project.name }}</h1>
+        <a href="{{ url_for('projects.edit_project', id=project.id) }}" class="btn btn-warning">Редактировать</a>
+    </div>
+
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Информация о проекте</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Клиент:</strong> {{ project.client }}</p>
+                    <p><strong>Статус:</strong> 
+                        <span class="badge {% if project.status == 'active' %}bg-success{% elif project.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}">
+                            {{ project.status }}
+                        </span>
+                    </p>
+                    <p><strong>Дедлайн:</strong> {{ project.deadline.strftime('%d.%m.%Y') if project.deadline else 'не указан' }}</p>
+                    <p><strong>Создан:</strong> {{ project.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                    {% if project.description %}
+                    <hr>
+                    <p><strong>Описание:</strong></p>
+                    <p>{{ project.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Файлы -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Файлы</h5>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#uploadForm">
+                        + Загрузить файл
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="collapse mb-3" id="uploadForm">
+                        <form method="POST" action="{{ url_for('projects.upload_file', id=project.id) }}" enctype="multipart/form-data">
+                            <div class="mb-2">
+                                <input type="file" name="file" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Загрузить</button>
+                        </form>
+                    </div>
+
+                    {% if project.attachments.count() > 0 %}
+                    <div class="list-group">
+                        {% for attachment in project.attachments %}
+                        <a href="{{ url_for('static', filename=attachment.file_path) }}" class="list-group-item list-group-item-action" target="_blank">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-file-earmark"></i> {{ attachment.file_name }}
+                                    <small class="text-muted">({{ (attachment.file_size / 1024)|round(2) }} KB)</small>
+                                </div>
+                                <small class="text-muted">{{ attachment.uploaded_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Файлы не загружены</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Комментарии -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Комментарии</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Форма добавления комментария -->
+                    <form method="POST" action="{{ url_for('projects.add_comment', id=project.id) }}" class="mb-4">
+                        <div class="mb-2">
+                            <textarea name="text" class="form-control" rows="3" placeholder="Написать комментарий..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+                    </form>
+
+                    <!-- Список комментариев -->
+                    {% if project.comments.count() > 0 %}
+                    <div class="list-group">
+                        {% for comment in project.comments.order_by(Comment.created_at.desc()).all() %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ comment.user.username }}</strong>
+                                    <p class="mb-1 mt-2">{{ comment.text }}</p>
+                                </div>
+                                <small class="text-muted">{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Комментариев пока нет</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="col-md-4">
+            <!-- Задачи -->
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6>Задачи</h6>
+                    <a href="{{ url_for('tasks.new') }}?project_id={{ project.id }}" class="btn btn-sm btn-primary">+</a>
+                </div>
+                <div class="card-body">
+                    {% if project.tasks.count() > 0 %}
+                    <ul class="list-group">
+                        {% for task in project.tasks.limit(5) %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ task.title }}</span>
+                            <span class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                {{ task.status }}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% if project.tasks.count() > 5 %}
+                    <a href="{{ url_for('tasks.list') }}?project_id={{ project.id }}" class="btn btn-sm btn-link">+ еще {{ project.tasks.count() - 5 }}</a>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted small">Задач нет</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Материалы -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6>Материалы</h6>
+                    <a href="{{ url_for('materials.add_to_project', project_id=project.id) }}" class="btn btn-sm btn-primary">+</a>
+                </div>
+                <div class="card-body">
+                    {% if project.materials.count() > 0 %}
+                    <ul class="list-group">
+                        {% for pm in project.materials.limit(5) %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <small>{{ pm.material.name }}</small>
+                                <small class="text-muted">{{ pm.planned_quantity }} {{ pm.material.unit }}</small>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted small">Материалов нет</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ url_for('projects.list_projects') }}" class="btn btn-secondary mt-3">Назад к списку</a>
+</div>
+{% endblock %}
