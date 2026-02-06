@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Связи
-    projects = db.relationship("Project", back_populates="owner")
+#     projects = db.relationship("Project", back_populates="owner")
 
     # Flask-Login требует эти методы
     def get_id(self):
@@ -49,8 +49,8 @@ class Project(db.Model):
     description = db.Column(db.Text, nullable=True)
 
     # Связи
-    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    owner = db.relationship("User", back_populates="projects")
+#     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    # owner = db.relationship("User", back_populates="projects")
 
     tasks = db.relationship("Task", back_populates="project", cascade="all, delete-orphan")
     materials = db.relationship("ProjectMaterial", back_populates="project", cascade="all, delete-orphan")
