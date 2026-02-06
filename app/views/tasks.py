@@ -43,8 +43,7 @@ def create_task():
             project_id=int(project_id),
             status=status,
             priority=priority,
-            deadline=deadline,
-        )
+            end_date=deadline,        )
         db.session.add(task)
         db.session.commit()
         flash("Задача создана", "success")
