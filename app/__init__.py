@@ -9,7 +9,8 @@ def create_app():
 
     # === базовая конфигурация ===
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
-
+    app.config["TELEGRAM_BOT_TOKEN"] = os.environ.get("TELEGRAM_BOT_TOKEN")
+        app.config["TELEGRAM_BOT_USERNAME"] = os.environ.get("TELEGRAM_BOT_USERNAME")
     # Render кладёт строку подключения Postgres в DATABASE_URL
     db_url = os.environ.get("DATABASE_URL")
     if db_url and db_url.startswith("postgres://"):
