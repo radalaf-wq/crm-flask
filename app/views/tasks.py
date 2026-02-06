@@ -47,7 +47,7 @@ def create_task():
         db.session.add(task)
         db.session.commit()
         flash("Задача создана", "success")
-        return redirect(url_for("tasks.list_tasks"))
+        return redirect(url_for("tasks.list_tasks_tasks"))
 
     # GET запрос - показываем форму
     projects = Project.query.filter_by(status="active").all()
