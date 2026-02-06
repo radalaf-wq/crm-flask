@@ -55,10 +55,9 @@ def create_app():
 
     # Пересоздать БД при каждом запуске
     with app.app_context():
-try:
+        try:
             db.drop_all()
-                            db.create_all()
-                                    except:
-            db.create_all()
-
+        except:
+            pass
+        db.create_all()
     return app
