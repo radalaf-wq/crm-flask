@@ -81,6 +81,23 @@ class Task(db.Model):
 
     def __repr__(self):
         return f"<Task {self.id} {self.title}>"
+# ========== Вложения ==========
+class Attachment(db.Model):
+    """Вложение к проекту"""
+    __tablename__ = "attachments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    file_path = db.Column(db.String(500), nullable=False)
+    uploaded_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # Связи
+    project = db.relationship("Project", back_populates="attachments")
+
+    def __repr__(self):
+        return f"<Attachment {self.id} {self.filename}>"
+
 
 class Attachment(db.Model):
     __tablename__ = "attachments"
