@@ -9,25 +9,7 @@
     >
   </head>
   <body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-      <div class="container-fluid">
-        <a class="navbar-brand mb-0 h1" href="{{ url_for('dashboard.index') }}">
-          CRM Dashboard
-        </a>
-        <div class="d-flex">
-          <a class="btn btn-outline-light me-2" href="{{ url_for('projects.list_projects') }}">
-            Проекты
-          </a>
-                    <a class="btn btn-outline-light me-2" href="{{ url_for('tasks.list_tasks') }}">
-            Задачи
-          </a>
-                                  <a class="btn btn-outline-light me-2" href="{{ url_for('materials.list') }}">
-                            Материалы
-                        </a>
-        </div>
-      </div>
-    </nav>
-
+    {% include 'components/navbar.html' %}
     <div class="container">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
