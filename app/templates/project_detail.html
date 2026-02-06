@@ -2,61 +2,21 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ project.name }}</h1>
-    </div>
-
-    <div class="row">
-        <!-- Основная информация -->
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Информация о проекте</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Клиент:</strong> {{ project.client }}</p>
-                    <p><strong>Статус:</strong> 
-                        <span class="badge {% if project.status == 'active' %}bg-success{% elif project.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}">
-                            {{ project.status }}
-                        </span>
-                    </p>
-                    <p><strong>Дедлайн:</strong> {{ project.deadline.strftime('%d.%m.%Y') if project.deadline else 'не указан' }}</p>
-                    <p><strong>Создан:</strong> {{ project.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
-                    {% if project.description %}
-                    <hr>
-                    <p><strong>Описание:</strong></p>
-                    <p>{{ project.description }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Файлы -->
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>Файлы</h5>
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#uploadForm">
-                        + Загрузить файл
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="collapse mb-3" id="uploadForm">
-                        <form method="POST" action="{{ url_for('projects.upload_file', id=project.id) }}" enctype="multipart/form-data">
-                            <div class="mb-2">
-                                <input type="file" name="file" class="form-control" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Загрузить</button>
-                        </form>
-                    </div>
-
-                    {% if project.attachments|length > 0 %}
-                                <div class="list-group">
-                                                    {% for attachment in project.attachments %}
-                                                                        <div class="list-group-item">{{ attachment.filename }} <small>({{ attachment.uploaded_at.strftime('%d.%m.%Y %H:%M') }})</small></div>
-                                                                                        {% endfor %}
-                                                                                                    </div>
-                                                                                                            {% else %}
-                                                                                                                        <p>Нет загруженных файлов</p>
-                                </div>        {% endif %}
+    <h2>{{ project.name }}</h2>
+    
+    <div class="card mt-3">
+        <div class="card-body">
+            <p><strong>Клиент:</strong> {{ project.client }}</p>
+            <p><strong>Статус:</strong> 
+                {% if project.status == 'planning' %}Планирование
+                {% elif project.status == 'in_progress' %}В работе
+                {% elif project.status == 'completed' %}Завершен
+                {% else %}Неизвестно
+                {% endif %}
+            </p>
+            <p><strong>Дата начала:</strong> {{ project.start_date.strftime('%d.%m.%Y') if project.start_date else 'Не указана' }}</p>
+            <p><strong>Дата окончания:</strong> {{ project.end_date.strftime('%d.%m.%Y') if project.end_date else 'Не указана' }}</p>
+        </div>
     </div>
 </div>
 
