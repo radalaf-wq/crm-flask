@@ -53,3 +53,10 @@ def create_app():
         return "OK"
 
     return app
+
+    @app.route("/reset-db-dangerous")
+    def reset_db():
+        """ОПАСНО: Удаляет все таблицы и создаёт заново"""
+        db.drop_all()
+        db.create_all()
+        return "Database reset complete. All tables dropped and recreated."
