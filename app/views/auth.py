@@ -1,6 +1,15 @@
 import hashlib
 import hmac
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    current_app,
+)
 from flask_login import login_user, logout_user, login_required
 from app.extensions import db
 from app.models import User
@@ -43,7 +52,6 @@ def telegram_callback():
 
     # Ищем пользователя в БД
     user = User.query.filter_by(telegram_id=telegram_id).first()
-
     if not user:
         # Если пользователя нет — создаём
         user = User(
@@ -90,11 +98,10 @@ def verify_telegram_auth(auth_data, bot_token):
 
     # Формируем строку для проверки
     data_check_string = "\n".join(
-        [f"{k}={v}" for k, v in sorted(auth_data.items()) if v is not None]
+        f"{k}={v}" for k, v in sorted(auth_data.items()) if v is not None
     )
 
     # Создаём секретный ключ из токена бота
     secret_key = hashlib.sha256(bot_token.encode()).digest()
     hmac_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-
     return hmac_hash == check_hash

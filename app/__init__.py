@@ -10,7 +10,8 @@ def create_app():
     # === базовая конфигурация ===
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["TELEGRAM_BOT_TOKEN"] = os.environ.get("TELEGRAM_BOT_TOKEN")
-    app.config["TELEGRAM_BOT_USERNAME"] = os.environ.get("TELEGRAM_BOT_USERNAME")
+    app.config["TELEGRAM_BOT_USERNAME"] = os.getenv("TELEGRAM_BOT_USERNAME", "CeeReeMbot")
+    db_url = os.environ.get("DATABASE_URL", f"sqlite:///{app.instance_path}/crm.db")
     if db_url and db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
@@ -57,8 +58,6 @@ def create_app():
         return redirect(url_for("login"))
 
     # Пересоздать БД при каждом запуске
-    with app.app_context():
-        # Удаляем и пересоздаем таблицы принудительно
         from sqlalchemy import inspect
         inspector = inspect(db.engine)
         
@@ -68,7 +67,6 @@ def create_app():
         # Удаляем все таблицы
         if tables:
             with db.engine.connect() as conn:
-                conn.execute(db.text('DROP SCHEMA public CASCADE'))
                 conn.execute(db.text('CREATE SCHEMA public'))
                 conn.commit()
         
