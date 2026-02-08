@@ -14,7 +14,11 @@
           <a class="nav-link" href="{{ url_for('tasks.list_tasks') }}">Tasks</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('materials.list_materials') }}">Materials</a>
+          <!-- временно ведём на список материалов по проекту 1
+               или просто убираем ссылку, если не нужна -->
+          <a class="nav-link" href="{{ url_for('materials.project_materials', project_id=1) }}">
+            Materials
+          </a>
         </li>
       </ul>
 
