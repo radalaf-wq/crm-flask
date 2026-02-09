@@ -1,7 +1,14 @@
 # app/models.py
+
 from datetime import datetime
+
 from flask_login import UserMixin
+
 from .extensions import db
+
+
+TASK_STATUS_CHOICES = ("to_do", "in_progress", "done")
+TASK_PRIORITY_CHOICES = ("low", "medium", "high")
 
 
 class User(UserMixin, db.Model):
@@ -15,10 +22,6 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), default="user")  # admin, manager, user
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Связи
-#     projects = db.relationship("Project", back_populates="owner")
-
-    # Flask-Login требует эти методы
     def get_id(self):
         return str(self.id)
 
@@ -35,7 +38,7 @@ class User(UserMixin, db.Model):
         return False
 
     def __repr__(self):
-        return f"<User {self.telegram_id} ({self.username})>"
+        return f"<User id={self.id} username={self.username!r} role={self.role!r}>"
 
 
 class Project(db.Model):
@@ -48,19 +51,32 @@ class Project(db.Model):
     deadline = db.Column(db.DateTime, nullable=True)
     description = db.Column(db.Text, nullable=True)
 
-    # Связи
-#     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    # owner = db.relationship("User", back_populates="projects")
-
-    tasks = db.relationship("Task", back_populates="project", cascade="all, delete-orphan")
-    materials = db.relationship("ProjectMaterial", back_populates="project", cascade="all, delete-orphan")
-    comments = db.relationship("Comment", back_populates="project", cascade="all, delete-orphan")
+    tasks = db.relationship(
+        "Task",
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
+    materials = db.relationship(
+        "ProjectMaterial",
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
+    comments = db.relationship(
+        "Comment",
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     def __repr__(self):
-        return f"<Project {self.id} {self.name}>"
+        return f"<Project id={self.id} name={self.name!r} status={self.status!r}>"
 
 
 class Task(db.Model):
@@ -69,8 +85,8 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(50), default="to_do")  # to_do, in_progress, done
-    priority = db.Column(db.String(50), default="medium")  # low, medium, high
+    status = db.Column(db.String(50), default="to_do")
+    priority = db.Column(db.String(50), default="medium")
     start_date = db.Column(db.DateTime, nullable=True)
     end_date = db.Column(db.DateTime, nullable=True)
 
@@ -78,10 +94,18 @@ class Task(db.Model):
     project = db.relationship("Project", back_populates="tasks")
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     def __repr__(self):
-        return f"<Task {self.id} {self.title}>"
+        return (
+            f"<Task id={self.id} title={self.title!r} "
+            f"status={self.status!r} priority={self.priority!r}>"
+        )
 
 
 class Material(db.Model):
@@ -89,18 +113,26 @@ class Material(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    unit = db.Column(db.String(50), nullable=False)  # м, кг, шт и т.д.
+    unit = db.Column(db.String(50), nullable=False)
     price_per_unit = db.Column(db.Float, nullable=False)
     stock_quantity = db.Column(db.Float, default=0)
     description = db.Column(db.Text, nullable=True)
 
-    project_materials = db.relationship("ProjectMaterial", back_populates="material")
+    project_materials = db.relationship(
+        "ProjectMaterial",
+        back_populates="material",
+    )
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     def __repr__(self):
-        return f"<Material {self.id} {self.name}>"
+        return f"<Material id={self.id} name={self.name!r}>"
 
 
 class ProjectMaterial(db.Model):
@@ -116,7 +148,11 @@ class ProjectMaterial(db.Model):
     material = db.relationship("Material", back_populates="project_materials")
 
     def __repr__(self):
-        return f"<ProjectMaterial {self.project_id}-{self.material_id}>"
+        return (
+            f"<ProjectMaterial id={self.id} "
+            f"project_id={self.project_id} material_id={self.material_id} "
+            f"quantity={self.quantity}>"
+        )
 
 
 class Comment(db.Model):
@@ -132,7 +168,15 @@ class Comment(db.Model):
     user = db.relationship("User", backref="comments")
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     def __repr__(self):
-        return f"<Comment {self.id} on Project {self.project_id}>"
+        return (
+            f"<Comment id={self.id} project_id={self.project_id} "
+            f"user_id={self.user_id}>"
+        )

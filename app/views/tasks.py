@@ -1,25 +1,32 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.extensions import db
-from app.models import Task, Project, User
+# app/views/tasks.py
+
 from datetime import datetime
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
+
+from app.extensions import db
+from app.models import Task, Project
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
 @bp.route("/")
+@login_required
 def list_tasks():
     tasks = Task.query.order_by(Task.created_at.desc()).all()
     return render_template("tasks_list.html", tasks=tasks)
 
 
 @bp.route("/new", methods=["GET", "POST"])
+@login_required
 def create_task():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
         project_id = request.form.get("project_id", "").strip()
-        status = request.form.get("status", "new")
-        priority = request.form.get("priority", "normal")
+        status = request.form.get("status", "to_do")
+        priority = request.form.get("priority", "medium")
         deadline_str = request.form.get("deadline", "").strip()
 
         if not title:
@@ -43,12 +50,13 @@ def create_task():
             project_id=int(project_id),
             status=status,
             priority=priority,
-            end_date=deadline,        )
+            end_date=deadline,
+        )
         db.session.add(task)
         db.session.commit()
+
         flash("Задача создана", "success")
         return redirect(url_for("tasks.list_tasks"))
 
-    # GET запрос - показываем форму
     projects = Project.query.filter_by(status="active").all()
     return render_template("task_form.html", projects=projects)
