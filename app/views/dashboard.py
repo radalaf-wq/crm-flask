@@ -1,30 +1,33 @@
 from flask import Blueprint, render_template
-from sqlalchemy import func
-from app.extensions import db
-from app.models import Project, Task
-from datetime import datetime
+from flask_login import login_required
 
-bp = Blueprint("dashboard", __name__)
+from app.models import Project, Task, Material
 
-def get_dashboard_counters():
-    total_projects = db.session.query(func.count(Project.id)).scalar()
-    total_tasks = db.session.query(func.count(Task.id)).scalar()
-    tasks_overdue = (
-        db.session.query(func.count(Task.id))
-        .filter(
-            Task.status != "done",
-            Task.end_date != None,
-            Task.end_date < datetime.utcnow(),
-        )
-        .scalar()
-    )
-    return {
-        "total_projects": total_projects or 0,
-        "total_tasks": total_tasks or 0,
-        "tasks_overdue": tasks_overdue or 0,
-    }
+bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
+
 
 @bp.route("/")
-def index():
-    counters = get_dashboard_counters()
-    return render_template("dashboard.html", counters=counters)
+@login_required
+def dashboard():
+    total_projects = Project.query.count()
+    active_projects = Project.query.filter_by(status="active").count()
+    closed_projects = Project.query.filter_by(status="closed").count()
+
+    total_tasks = Task.query.count()
+    tasks_to_do = Task.query.filter_by(status="to_do").count()
+    tasks_in_progress = Task.query.filter_by(status="in_progress").count()
+    tasks_done = Task.query.filter_by(status="done").count()
+
+    total_materials = Material.query.count()
+
+    return render_template(
+        "dashboard.html",
+        total_projects=total_projects,
+        active_projects=active_projects,
+        closed_projects=closed_projects,
+        total_tasks=total_tasks,
+        tasks_to_do=tasks_to_do,
+        tasks_in_progress=tasks_in_progress,
+        tasks_done=tasks_done,
+        total_materials=total_materials,
+    )
