@@ -1,5 +1,3 @@
-# app/utils/security.py
-
 from functools import wraps
 
 from flask import abort
@@ -8,8 +6,12 @@ from flask_login import current_user
 
 def roles_required(*roles):
     """
+    Проверяет, что пользователь авторизован и имеет одну из указанных ролей.
+    
     Пример:
-    @roles_required("admin", "manager")
+        @roles_required("admin", "manager")
+        def protected_route():
+            ...
     """
     def decorator(f):
         @wraps(f)

@@ -20,6 +20,11 @@ def dashboard():
 
     total_materials = Material.query.count()
 
+    # Задачи по приоритету
+    high_priority = Task.query.filter_by(priority="high").count()
+    medium_priority = Task.query.filter_by(priority="medium").count()
+    low_priority = Task.query.filter_by(priority="low").count()
+
     return render_template(
         "dashboard.html",
         total_projects=total_projects,
@@ -30,4 +35,7 @@ def dashboard():
         tasks_in_progress=tasks_in_progress,
         tasks_done=tasks_done,
         total_materials=total_materials,
+        high_priority=high_priority,
+        medium_priority=medium_priority,
+        low_priority=low_priority,
     )

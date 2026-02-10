@@ -1,9 +1,8 @@
-# app/__init__.py
-
 import os
 
 from flask import Flask, redirect, url_for
 from sqlalchemy import inspect
+
 from .extensions import db, login_manager
 
 
@@ -20,7 +19,6 @@ def create_app():
     if db_url and db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-    # SQLite по умолчанию в dev
     if not db_url:
         os.makedirs(app.instance_path, exist_ok=True)
         db_url = f"sqlite:///{os.path.join(app.instance_path, 'crm.db')}"
@@ -28,7 +26,6 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    # === расширения ===
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
@@ -38,11 +35,10 @@ def create_app():
         from .models import User
         return User.query.get(int(user_id))
 
-    # === регистрация моделей и blueprints ===
     with app.app_context():
         from . import models  # noqa
 
-        # ВРЕМЕННО: только если БД пустая — создать таблицы
+        # ТОЛЬКО если БД пустая — создать таблицы
         inspector = inspect(db.engine)
         if not inspector.get_table_names():
             db.create_all()
@@ -59,12 +55,4 @@ def create_app():
         app.register_blueprint(materials_bp)
         app.register_blueprint(auth_bp)
 
-    @app.route("/health")
-    def health():
-        return "OK"
-
-    @app.route("/")
-    def index():
-        return redirect(url_for("auth.login"))
-
-    return app
+    @app.route("/he

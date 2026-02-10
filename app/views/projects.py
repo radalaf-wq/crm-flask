@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 
 from app.extensions import db
-from app.models import Project
+from app.models import Project, Comment
 
 bp = Blueprint("projects", __name__, url_prefix="/projects")
 
@@ -55,7 +55,7 @@ def create_project():
 
 @bp.route("/<int:project_id>")
 @login_required
-def project_detail(project_id):
+def view_project(project_id):
     project = Project.query.get_or_404(project_id)
     return render_template("project_detail.html", project=project)
 
@@ -91,7 +91,7 @@ def edit_project(project_id):
 
         db.session.commit()
         flash("Проект обновлён", "success")
-        return redirect(url_for("projects.project_detail", project_id=project.id))
+        return redirect(url_for("projects.view_project", project_id=project.id))
 
     return render_template("project_form.html", project=project)
 
@@ -104,3 +104,27 @@ def delete_project(project_id):
     db.session.commit()
     flash("Проект удалён", "success")
     return redirect(url_for("projects.list_projects"))
+
+
+@bp.route("/<int:project_id>/comment", methods=["POST"])
+@login_required
+def add_comment(project_id):
+    from flask_login import current_user
+    
+    project = Project.query.get_or_404(project_id)
+    text = request.form.get("text", "").strip()
+
+    if not text:
+        flash("Текст комментария не может быть пустым", "danger")
+        return redirect(url_for("projects.view_project", project_id=project.id))
+
+    comment = Comment(
+        text=text,
+        project_id=project.id,
+        user_id=current_user.id,
+    )
+    db.session.add(comment)
+    db.session.commit()
+
+    flash("Комментарий добавлен", "success")
+    return redirect(url_for("projects.view_project", project_id=project.id))
