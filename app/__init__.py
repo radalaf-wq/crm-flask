@@ -55,4 +55,12 @@ def create_app():
         app.register_blueprint(materials_bp)
         app.register_blueprint(auth_bp)
 
-    @app.route("/he
+    @app.route("/health")
+    def health():
+        return "OK"
+
+    @app.route("/")
+    def index():
+        return redirect(url_for("auth.login"))
+
+    return app
