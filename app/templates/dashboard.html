@@ -1,29 +1,84 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="row">
-  <div class="col-md-4">
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">Проектов всего</h5>
-        <p class="card-text fs-3">{{ counters.total_projects }}</p>
+<hr class="my-4">
+
+<h2 class="h4 mb-3">Проекты</h2>
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+  {% for project in projects %}
+  <div class="col">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="card-title mb-0">
+            <a href="{{ url_for('projects.view_project', project_id=project.id) }}">
+              {{ project.name }}
+            </a>
+          </h5>
+          {% if project.status == 'active' %}
+            <span class="badge bg-success">Активен</span>
+          {% elif project.status == 'on_hold' %}
+            <span class="badge bg-warning text-dark">Пауза</span>
+          {% elif project.status == 'closed' %}
+            <span class="badge bg-secondary">Закрыт</span>
+          {% else %}
+            <span class="badge bg-light text-dark">{{ project.status }}</span>
+          {% endif %}
+        </div>
+
+        {% if project.client %}
+        <p class="text-muted mb-2">
+          Клиент: <strong>{{ project.client }}</strong>
+        </p>
+        {% endif %}
+
+        {% if project.deadline %}
+        <p class="mb-2">
+          Дедлайн:
+          <span class="fw-semibold">
+            {{ project.deadline.strftime('%d.%m.%Y') }}
+          </span>
+        </p>
+        {% endif %}
+
+        <p class="card-text text-truncate mb-3">
+          {{ project.description or 'Описание не указано' }}
+        </p>
+
+        <div class="mt-auto">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="small text-muted">
+              Задач:
+              <strong>{{ project.tasks|length }}</strong>
+              ,
+              выполнено:
+              <strong>
+                {{
+                  project.tasks
+                    |selectattr('status', 'equalto', 'done')
+                    |list
+                    |length
+                }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- Исполнители: пока заглушка, позже привяжем User -->
+          <div class="small text-muted mb-2">
+            Исполнители:
+            <span class="badge bg-light text-dark">позже добавим</span>
+          </div>
+
+          <!-- Файлы: иконки PDF/DOC/XLS/etc — пока заглушка -->
+          <div class="small">
+            <span class="me-1">Файлы:</span>
+            <i class="fa fa-file-pdf-o text-danger me-1"></i>
+            <i class="fa fa-file-word-o text-primary me-1"></i>
+            <i class="fa fa-file-excel-o text-success me-1"></i>
+            <span class="text-muted">(иконки пока статичны)</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">Задач всего</h5>
-        <p class="card-text fs-3">{{ counters.total_tasks }}</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">Просроченных</h5>
-        <p class="card-text fs-3 text-danger">{{ counters.tasks_overdue }}</p>
-      </div>
-    </div>
-  </div>
+  {% else %}
+  <p class="text-muted">Пока нет проектов.</p>
+  {% endfor %}
 </div>
-{% endblock %}
