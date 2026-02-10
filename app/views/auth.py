@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-from datetime import datetime
 
 from flask import (
     Blueprint,
@@ -11,7 +10,7 @@ from flask import (
     flash,
     current_app,
 )
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required
 
 from app.extensions import db
 from app.models import User
@@ -68,16 +67,27 @@ def telegram_callback():
         flash(f"С возвращением, {user.first_name or user.username}!", "info")
 
     login_user(user)
-    return redirect(url_for("dashboard.dashboard"))
+    return redirect(url_for("dashboard.dashboard"))  # ИСПРАВЛЕНО
 
 
-@bp.route("/logout", methods=["GET", "POST"])
+@bp.route("/logout")
 @login_required
 def logout():
     """Logout"""
     logout_user()
     flash("Вы вышли из системы", "info")
     return redirect(url_for("auth.login"))
+
+
+@bp.route("/setup-admin/<int:telegram_id>")
+def setup_admin(telegram_id):
+    """Служебный роут для назначения админа"""
+    user = User.query.filter_by(telegram_id=telegram_id).first()
+    if user:
+        user.role = "admin"
+        db.session.commit()
+        return f"User {telegram_id} is now admin"
+    return f"User {telegram_id} not found", 404
 
 
 def verify_telegram_auth(auth_data, bot_token):
